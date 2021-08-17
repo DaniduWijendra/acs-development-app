@@ -7,6 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
+//disable mongo auto configurations
+//@SpringBootApplication(exclude = {
+//        MongoAutoConfiguration.class,
+//        MongoDataAutoConfiguration.class
+//})
 public class AcsDevelopmentAppApplication {
 
     public static void main(String[] args) {

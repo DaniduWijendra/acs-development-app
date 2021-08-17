@@ -11,6 +11,10 @@ public class ErrorHandling {
     private String invalidData;
     private String msgConErrorCode;
     private String msgConErrorMsg;
+    private String deleteErrorCode;
+    private String deleteErrorMessage;
+
+
 
     public String getSaveErrorCode() {
         return saveErrorCode;
@@ -50,5 +54,21 @@ public class ErrorHandling {
 
     public void setMsgConErrorMsg(String msgConErrorMsg) {
         this.msgConErrorMsg = msgConErrorMsg;
+    }
+
+    public String getDeleteErrorCode() {
+        return deleteErrorCode;
+    }
+
+    public void setDeleteErrorCode(String deleteErrorCode) {
+        this.deleteErrorCode = deleteErrorCode;
+    }
+
+    public String getDeleteErrorMessage() {
+        return deleteErrorMessage;
+    }
+
+    public void setDeleteErrorMessage(String deleteErrorMessage) {
+        this.deleteErrorMessage = deleteErrorMessage;
     }
 }

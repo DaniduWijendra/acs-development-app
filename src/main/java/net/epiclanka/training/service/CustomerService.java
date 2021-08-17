@@ -13,4 +13,6 @@ public interface CustomerService {
     public ResponseEntity<Object> getCustomerById(Long customerId);
     public ResponseEntity<Object> getCustomerNameFilter(String customerName);
     public CompletableFuture<List<CustomerModel>> getCustomersByAge();
+    public ResponseEntity<Object> updateCustomer(Long customerId, Customer customer);
+    public ResponseEntity<Object> deleteCustomer(Long customerId);
 }

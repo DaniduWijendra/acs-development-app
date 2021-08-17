@@ -90,4 +90,15 @@ public class CustomerModel {
         this.phoneNumber = phoneNumber;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof CustomerModel))
+            return false;
+        if (obj == this)
+            return true;
+        return this.getId() == ((CustomerModel) obj).getId();
+    }
+
+
 }

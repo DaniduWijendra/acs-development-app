@@ -67,6 +67,17 @@ public class CustomerController {
                 .<ResponseEntity>thenApply(ResponseEntity::ok)
             .exceptionally(handleCustomerDataFailure);
     }
+    @PutMapping(value = EndPoint.UPDATE_CUSTOMER, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> updateCustomer(@PathVariable Long customerId, @Valid @RequestBody CustomerDto customerDto)
+    {
+        Customer customer = modelMapper.map(customerDto, Customer.class);
+        return customerService.updateCustomer(customerId, customer);
+    }
+    @DeleteMapping(value = EndPoint.DELETE_CUSTOMER, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> deleteCustomer(@PathVariable Long customerId)
+    {
+        return customerService.deleteCustomer(customerId);
+    }
 
     private static Function<Throwable, ResponseEntity<? extends List<CustomerModel>>> handleCustomerDataFailure = throwable -> {
         LOGGER.error("Failed to read records: {}", throwable);

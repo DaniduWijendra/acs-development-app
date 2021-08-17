@@ -49,6 +49,56 @@ public class CustomerServiceImpl implements CustomerService {
         this.mongoTemplate = mongoTemplate;
     }
 
+    @Override
+    public ResponseEntity<Object> updateCustomer(Long customerId, Customer newCustomer) {
+        CustomerResponse customerResponse = new CustomerResponse();
+        try {
+            customerRepo.findById(customerId).map(customer ->
+            {
+                customer.setNic(EncoderDecoder.base64Encoding(customer.getNic()));
+                customer.setName(newCustomer.getName());
+                customer.setEmail(newCustomer.getEmail());
+                customer.setAge(newCustomer.getAge());
+                customer.setPhoneNumber(newCustomer.getPhoneNumber());
+                customerRepo.save(modelMapper.map(customer, CustomerModel.class));
+                customerResponse.setStatus("Success");
+                customerResponse.setCustomerName(newCustomer.getName());
+                customerResponse.setCustomerId(customerId);
+                return new ResponseEntity<>(customerResponse, HttpStatus.OK);
+            }).orElseGet(() -> {
+                newCustomer.setId(customerId);
+                customerResponse.setStatus("New Customer Created");
+                customerResponse.setCustomerName(newCustomer.getName());
+                customerResponse.setCustomerId(newCustomer.getId());
+                customerRepo.save(modelMapper.map(newCustomer, CustomerModel.class));
+                return new ResponseEntity<>(customerResponse, HttpStatus.OK);
+            });
+            return new ResponseEntity<>(customerResponse, HttpStatus.OK);
+        } catch (NullPointerException | QueryTimeoutException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteCustomer(Long customerId) {
+        CustomerResponse customerResponse = new CustomerResponse();
+        if(customerRepo.existsById(customerId))
+        {
+            customerRepo.deleteById(customerId);
+            customerResponse.setCustomerId(customerId);
+            customerResponse.setStatus("Success");
+            return new ResponseEntity<>(customerResponse, HttpStatus.OK);
+        }
+        else
+        {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setErrorCode(errorHandling.getDeleteErrorCode());
+            errorResponse.setErrorMessage(errorHandling.getDeleteErrorMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @Override
     public ResponseEntity<Object> addCustomerData(Customer customer) {
@@ -103,7 +153,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public ResponseEntity<Object> getCustomerNameFilter(String customer) {
         try {
-            List<Object> nameList = new ArrayList<>();
+            Set<Object> nameList = new HashSet<>();
             Query query = new Query();
             query.fields().include("name").exclude("id");
             List<Object> customerNameList = mongoTemplate.find(query, CustomerModel.class).stream().map(CustomerModel::getName).collect(Collectors.toList());
@@ -138,7 +188,7 @@ public class CustomerServiceImpl implements CustomerService {
                 CustomerModel customerModel1 = customerModel.get();
                 customerModel1.setNic(EncoderDecoder.base64Decoding(customerModel1.getNic()));
             } else {
-                System.out.println("Invalid id");
+                LOGGER.info("Invalid Id");
             }
 
             return new ResponseEntity<>(customerModel, HttpStatus.OK);
@@ -156,9 +206,10 @@ public class CustomerServiceImpl implements CustomerService {
     public CompletableFuture<List<CustomerModel>> getCustomersByAge() {
         Query query = new Query();
         query.addCriteria(Criteria.where("age").gt(20));
-        List<CustomerModel> users = mongoTemplate.find(query,CustomerModel.class);
+        List<CustomerModel> users = mongoTemplate.find(query, CustomerModel.class);
         Set<Integer> customerAges = customerRepo.findAll().stream().map(x -> x.getAge()).collect(Collectors.toSet());
         LOGGER.info("Customer Ages\n" + customerAges);
         return CompletableFuture.completedFuture(users);
     }
+
 }
